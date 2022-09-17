@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
         mainWebView = findViewById(R.id.mainWebView);
         mainLoadIndicator= findViewById(R.id.mainLoadIndicator);
         mainFooter = findViewById(R.id.mainFooter);
-        setUpFooter(mainFooter, Objects.requireNonNull(getFooterDataFromJSONFile()));
         setUpActivity(mainWebView);
+        setUpFooter(mainFooter, Objects.requireNonNull(getFooterDataFromJSONFile()));
     }
 
     @Override
@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 mainLoadIndicator.setVisibility(View.GONE);
-                // to fix the glitch where the home url ads an extra / at the end
-                // example: https://www.webtonative.com/
+                // to fix the bug where the home url ads an extra '/' at the end
+                // example: https://www.webtonative.com/ [x]
                 if (url.charAt(url.length() - 1) == '/')
                     url = url.substring(0, url.length() - 1);
                 for (int i = 0; i < mainFooter.getTabCount(); i++) {
@@ -125,12 +125,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (tabs != null && tabs.length > 0) {
             try {
+                String label, link;
+                int iconId;
                 for (JSONObject tab : tabs) {
-                    tabLayout.addTab(tabLayout.newTab()
-                            .setText(tab.getString("label"))
-                            .setContentDescription(tab.getString("link"))
-                            .setIcon(get_R_id_ofTabIcon(tab.getString("icon")))
-                    );
+                    label = tab.getString("label");
+                    link = tab.getString("link");
+                    iconId = get_R_id_ofTabIcon(tab.getString("icon"));
+                    if (label != null && link != null && iconId != 0) {
+                        tabLayout.addTab(tabLayout.newTab()
+                                .setText(label)
+                                .setContentDescription(link)
+                                .setIcon(iconId)
+                        );
+                    }
                 }
             }
             catch (Exception e) {
@@ -159,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
                 textColorUnSelected != null ? Color.parseColor(textColorUnSelected) : Color.GRAY
         };
         tabLayout.setTabIconTint(new ColorStateList(states, colors));
+
+        mainLoadIndicator.setBackgroundColor(
+                bgColor != null ? Color.parseColor(bgColor) : Color.BLUE
+        );
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
