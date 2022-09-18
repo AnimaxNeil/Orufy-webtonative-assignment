@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mainLoadIndicator;
     private TabLayout mainFooter;
     private long last_back_pressed_time = 0;
-    private boolean dontLoadTabLink; // to fix multi tab select glitch
+    private boolean dontLoadTabLink; // to fix multi tab select glitch --very-important
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 mainLoadIndicator.setVisibility(View.GONE);
                 // to fix the bug where the home url ads an extra '/' at the end
                 // example: https://www.webtonative.com/ [x]
-                if (url != null && url.charAt(url.length() - 1) == '/')
+                if (url != null && url.length() > 0 && url.charAt(url.length() - 1) == '/')
                     url = url.substring(0, url.length() - 1);
                 for (int i = 0; i < mainFooter.getTabCount(); i++) {
                     TabLayout.Tab tab = mainFooter.getTabAt(i);
@@ -191,9 +191,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleTabSelection(TabLayout.Tab tab) {
         String tabURL = Objects.requireNonNull(tab.getContentDescription()).toString();
+        String url = mainWebView.getUrl();
+        // to fix the bug where the home url ads an extra '/' at the end
+        // example: https://www.webtonative.com/ [x]
+        if (url != null && url.length() > 0 && url.charAt(url.length() - 1) == '/')
+            url = url.substring(0, url.length() - 1);
         if (tabURL != null && !dontLoadTabLink) {
             mainWebView.stopLoading();
-            if (!tabURL.equals(mainWebView.getOriginalUrl())) {
+            if (!(tabURL.equals(url) || tabURL.equals(mainWebView.getOriginalUrl()))) {
                 mainWebView.loadUrl(tabURL);
             }
         }
