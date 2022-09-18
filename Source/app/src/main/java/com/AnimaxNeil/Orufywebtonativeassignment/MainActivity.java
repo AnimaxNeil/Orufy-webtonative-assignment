@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mainLoadIndicator;
     private TabLayout mainFooter;
     private long last_back_pressed_time = 0;
+    private boolean dontLoadTabLink; // to fix multi tab select glitch
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +81,14 @@ public class MainActivity extends AppCompatActivity {
                 mainLoadIndicator.setVisibility(View.GONE);
                 // to fix the bug where the home url ads an extra '/' at the end
                 // example: https://www.webtonative.com/ [x]
-                if (url.charAt(url.length() - 1) == '/')
+                if (url != null && url.charAt(url.length() - 1) == '/')
                     url = url.substring(0, url.length() - 1);
                 for (int i = 0; i < mainFooter.getTabCount(); i++) {
                     TabLayout.Tab tab = mainFooter.getTabAt(i);
                     if (tab != null && Objects.requireNonNull(
                             tab.getContentDescription()).toString().equals(url)
                             && !tab.isSelected()) {
+                        dontLoadTabLink = true;
                         tab.select();
                         break;
                     }
@@ -174,23 +176,28 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                String tabURL = Objects.requireNonNull(tab.getContentDescription()).toString();
-                if (!mainWebView.getUrl().equals(tabURL)) {
-                    mainWebView.loadUrl(tabURL);
-                }
+                handleTabSelection(tab);
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) { }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                if (mainWebView.getUrl() != tab.getContentDescription()) {
-                    mainWebView.loadUrl(
-                            Objects.requireNonNull(tab.getContentDescription()).toString()
-                    );
-                }
+                handleTabSelection(tab);
             }
         });
+        dontLoadTabLink = false;
         Objects.requireNonNull(tabLayout.getTabAt(0)).select();
+    }
+
+    private void handleTabSelection(TabLayout.Tab tab) {
+        String tabURL = Objects.requireNonNull(tab.getContentDescription()).toString();
+        if (tabURL != null && !dontLoadTabLink) {
+            mainWebView.stopLoading();
+            if (!tabURL.equals(mainWebView.getOriginalUrl())) {
+                mainWebView.loadUrl(tabURL);
+            }
+        }
+        dontLoadTabLink = false;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

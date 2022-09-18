@@ -26,7 +26,4 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.OrufyWebtonativeAssignment.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.OrufyWebtonativeAssignment.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

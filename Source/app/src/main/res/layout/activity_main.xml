@@ -34,10 +34,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:minHeight="0dp"
+        android:contentDescription="navigation tabs"
         app:tabTextAppearance="@style/TabTextAppearanceTab"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText">
 
     </com.google.android.material.tabs.TabLayout>
 
